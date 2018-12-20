@@ -1,3 +1,12 @@
+/**
+ * @author kimseonae
+ * @brief read file, and save datas in struct list
+ * @date 2018-12-20
+ * @file parsing.c
+ * @version 1.0.0
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +16,9 @@
 
 FILE* fp = NULL;	//global variable
 
+/**
+ * @struct save value
+ */
 struct List {	//structure
 	char name[10];
 	char size[10];
@@ -58,17 +70,23 @@ int main(void)
 			break;
 		}
 	}
-	
-	fclose(fp);
+
+
+	if(fclose(fp) == EOF) {
+		perror("fwenv.config");
+	}
+	else
+		printf("It's over! closed the file.");
 
 	return 0;
 
 }
 
 /**
- * @param fp list
- * store value in list
- * */
+ * @param fp file pointer
+ * @param list struct
+ * @brief store value in list
+ */
 void set_list(FILE* fp, struct List list)
 {
 
