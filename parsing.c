@@ -102,31 +102,7 @@ void set_list(FILE* fp, struct List list)
 		}
 		else if(!strncmp(buf, "}",1))	//finish
 			return;
-		else
-			return;
 	}
 	return;
 }
-
-//}
-/**
- * print buf
- * use malloc
- * use ftell
- */
-	/**
-	fseek(fp, 0, SEEK_END);
-	f_size = ftell(fp);
-	rewind(fp);
-
-	buf = (char*)malloc(sizeof(char) * f_size);
-	if(buf == NULL)
-		printf("Memory error");
-	
-	result = fread(buf, 1, f_size, fp);
-	
-	printf("%s\n", buf);
-*/
-
-//---------------------------------------------------------------------
 
