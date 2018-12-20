@@ -25,7 +25,6 @@ struct List {	//structure
 	char offset[10];
 };
 
-struct List list1, list2, list3;
 void set_list( FILE*, struct List* );
 void print_list(struct List*);
 
@@ -34,6 +33,8 @@ int main(void)
 	char buf[100] = {'\0',};
 	int f_size;		//print buf value
 	size_t result;	//print buf value
+	
+	struct List list1, list2, list3;
 	
 	fp = fopen("fwenv.config", "r");	//file open
 
