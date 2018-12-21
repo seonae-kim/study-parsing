@@ -17,6 +17,7 @@
 
 FILE* fp = NULL;	//global variable
 char num[100];
+//int rtn[50] = {'\0',};
 
 /**
  * @struct save value
@@ -30,7 +31,10 @@ struct List {	//structure
 int change_decimal(char []);
 void set_list( FILE*, struct List* );
 void print_list(struct List*);
-
+/*
+int *int_to_array(int);
+int *p = rtn;
+*/
 int main(void)
 {
 	char buf[100] = {'\0',};
@@ -135,11 +139,11 @@ void set_list(FILE* fp, struct List *list)
 			if( strchr(buf, 'x') != NULL)
 			{
 				decimal = change_decimal(buf);
-				list->size = decimal;
+				list->offset = decimal;
 			}
 			else
 			{
-				list->size = atoi(str+2);
+				list->offset = atoi(str+2);
 			}
 		}
 		else if(!strncmp(buf, "}",1))	//finish
@@ -198,3 +202,46 @@ int change_decimal(char buf[])
 	}
 	return -1;
 }
+/**
+/**
+ * @param num decimal
+ * brief int to array
+ *
+int *int_to_array(int num)
+{
+	int R; // 나머지
+	int i = 0, j = 0;
+	int decimal[50] = {'\0',};
+
+	printf("int_to_array in\n");
+	while(num  != 0)
+	{
+		R = num%10;
+		num = num/10;
+		decimal[i] = R;
+		i++;
+	}
+
+	i=0;
+
+	while(decimal[i] != '\0')
+	{
+		i++;
+	}
+	
+	for(j = 0; j < i; j++)
+	{
+		rtn[j] = decimal[i-j-1];
+	}
+	
+	for(i = 0; i < 5; i++)
+	{
+		j = *p;
+		p++;
+	}
+
+	
+
+	return p;
+}
+*/
