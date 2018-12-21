@@ -10,21 +10,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define FOPEN 1
 
 
 FILE* fp = NULL;	//global variable
+char num[100];
 
 /**
  * @struct save value
  */
 struct List {	//structure
 	char name[10];
-	char size[10];
-	char offset[10];
+	int size;	//16진수로 된 문자열
+	int offset;
 };
 
+int change_decimal(char []);
 void set_list( FILE*, struct List* );
 void print_list(struct List*);
 
@@ -39,9 +42,9 @@ int main(void)
 	fp = fopen("fwenv.config", "r");	//file open
 
 	if(fp == NULL)	
-		printf("file open fail\n");
+		printf("file open fail\n\n");
 	else
-		printf("file open success\n");
+		printf("file open success\n\n");
 
 	while( (fgets(buf, sizeof(buf), fp)) != NULL)	//first volume
 	{
@@ -100,25 +103,44 @@ void set_list(FILE* fp, struct List *list)
 	char *str;
 	//struct List list;
 	char buf[100] = {'\0'};
-	char push[100] = {'\0'};
+	int decimal;
 
 	while((fgets(buf, sizeof(buf), fp)) != NULL)	//buf가 pointer일 경우 EOF, 배열이면 NULL
 	{
 		if(!strncmp(buf, "\t\tname", 6))	//name
 		{
-			str = strstr(buf, "= ");
+			str = strstr(buf, "=");
 			strncpy(list->name, str+2, 20);	//str is "= name" so to get name, moved pointer +2
 		}
 	
 		else if(!strncmp(buf, "\t\tsize", 6))	//size
 		{
-			str = strstr(buf, "= ");
-			strcpy(list->size, str+2);
+			str = strstr(buf, "=");
+			strcpy(buf, str+2);
+			
+			if( strchr(buf, 'x') != NULL){
+				decimal = change_decimal(buf);
+				list->size = decimal; //change_decimal(buf);
+			}
+			else
+			{
+				list->size = atoi(str+2);
+			}
 		}
 		else if(!strncmp(buf, "\t\toffset", 8))	//offset
 		{
-			str = strstr(buf, "= ");
-			strcpy(list->offset, str+2);
+			str = strstr(buf, "=");
+			strcpy(buf, str+2);
+
+			if( strchr(buf, 'x') != NULL)
+			{
+				decimal = change_decimal(buf);
+				list->size = decimal;
+			}
+			else
+			{
+				list->size = atoi(str+2);
+			}
 		}
 		else if(!strncmp(buf, "}",1))	//finish
 			return;
@@ -132,11 +154,47 @@ void set_list(FILE* fp, struct List *list)
  */
 void print_list(struct List *list)
 {
-	printf("%s", list->name);
-	printf("%s", list->size);
-	printf("%s", list->offset);
+	printf("name : %s", list->name);
+	printf("size : %d\n", list->size);
+	printf("offset : %d\n", list->offset);
 
 	printf("\n");
 
 	return;
+}
+
+int change_decimal(char buf[])
+{
+	int i;
+	int decimal = 0;	//10진수를 저장할 변수
+	int position = 0;	//자리 수
+	
+
+	for( i = strlen(buf) -1; i >= 0; i--)
+	{
+		char ch = buf[i];
+
+
+		if( ch == 'x')
+		{
+			return decimal;
+		}
+		else if( ch >= '0' && ch <= '9')
+		{
+			decimal += (ch - 48) * pow(16, position);
+		}
+		else if (ch >= 65 && ch <= 70)
+		{
+			decimal += (ch - (97 - 10)) * pow(16, position);
+		}
+		else
+		{
+			continue;
+			
+		}
+
+		position++;
+
+	}
+	return -1;
 }
