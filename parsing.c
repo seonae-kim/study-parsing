@@ -17,7 +17,6 @@
 
 FILE* fp = NULL;	//global variable
 char num[100];
-//int rtn[50] = {'\0',};
 
 /**
  * @struct save value
@@ -28,21 +27,19 @@ struct List {	//structure
 	int offset;
 };
 
+
+
 int change_decimal(char []);
-void set_list( FILE*, struct List* );
-void print_list(struct List*);
-/*
-int *int_to_array(int);
-int *p = rtn;
-*/
+void set_list( FILE*, struct List*, int );
+void print_list(struct List[], int);
+
 int main(void)
 {
 	char buf[100] = {'\0',};
-	int f_size;		//print buf value
-	size_t result;	//print buf value
-	
-	struct List list1, list2, list3;
-	
+	int i;	//for for문
+	int count = 0;
+	struct List* list;
+
 	fp = fopen("fwenv.config", "r");	//file open
 
 	if(fp == NULL)	
@@ -50,41 +47,40 @@ int main(void)
 	else
 		printf("file open success\n\n");
 
-	while( (fgets(buf, sizeof(buf), fp)) != NULL)	//first volume
-	{
-		if( !strncmp(buf, "volume", 6))		//enter set_list with volume.
-		{
-			set_list(fp, &list1);
-			break;	//if return, break; for next volume
-		}
-	
-	}
 
-	while( (fgets(buf, sizeof(buf), fp)) != NULL)	//second volume
-	{
-		if( !strncmp(buf, "volume", 6)){
-		
-			set_list(fp, &list2);
-			break;
-		}
-
-	}
-
-	
-	while( (fgets(buf, sizeof(buf), fp)) != NULL)	//third volume
+	while( (fgets(buf, sizeof(buf), fp)) != NULL)	//count volmue
 	{
 		if( !strncmp(buf, "volume", 6))
 		{
-			set_list(fp, &list3);
-			break;
+			count++;
 		}
 	}
+	printf("count : %d\n", count);	
+	list = (struct List*) malloc(sizeof(struct List)*count);
 
-	print_list(&list1);
-	print_list(&list2);
-	print_list(&list3);
+	if(list == NULL)
+			printf("malloc fail\n");
+
+	rewind(fp);
+
+	for(i=0; i<count; i++)
+	{
+
+		while( (fgets(buf, sizeof(buf), fp)) != NULL)	//first volume
+		{
+			if( !strncmp(buf, "volume", 6))		//enter set_list with volume.
+			{
+				set_list(fp, list, i);
+				break;	//if return, break; for next volume
+			}
 	
+		}
+		print_list(list, i);
+	}
+
 	
+	free(list);
+
 	if(fclose(fp) == EOF) {
 		perror("fwenv.config\n");
 	}
@@ -95,17 +91,16 @@ int main(void)
 
 }
 
+
 /**
  * @param fp file pointer
  * @param list struct
  * @brief store value in list
  */
-void set_list(FILE* fp, struct List *list)
+void set_list(FILE* fp, struct List list[], int i)
 {
 
-
 	char *str;
-	//struct List list;
 	char buf[100] = {'\0'};
 	int decimal;
 
@@ -114,7 +109,7 @@ void set_list(FILE* fp, struct List *list)
 		if(!strncmp(buf, "\t\tname", 6))	//name
 		{
 			str = strstr(buf, "=");
-			strncpy(list->name, str+2, 20);	//str is "= name" so to get name, moved pointer +2
+			strncpy(list[i].name, str+2, 20);	//str is "= name" so to get name, moved pointer +2
 		}
 	
 		else if(!strncmp(buf, "\t\tsize", 6))	//size
@@ -124,11 +119,11 @@ void set_list(FILE* fp, struct List *list)
 			
 			if( strchr(buf, 'x') != NULL){
 				decimal = change_decimal(buf);
-				list->size = decimal; //change_decimal(buf);
+				list[i].size = decimal; //change_decimal(buf);
 			}
 			else
 			{
-				list->size = atoi(str+2);
+				list[i].size = atoi(str+2);
 			}
 		}
 		else if(!strncmp(buf, "\t\toffset", 8))	//offset
@@ -139,28 +134,30 @@ void set_list(FILE* fp, struct List *list)
 			if( strchr(buf, 'x') != NULL)
 			{
 				decimal = change_decimal(buf);
-				list->offset = decimal;
+				list[i].offset = decimal;
 			}
 			else
 			{
-				list->offset = atoi(str+2);
+				list[i].offset = atoi(str+2);
 			}
 		}
 		else if(!strncmp(buf, "}",1))	//finish
 			return;
 	}
 	return;
+
 }
 
 /**
  * @brief print data
  * @param list structure
  */
-void print_list(struct List *list)
+	
+void print_list(struct List list[], int i)
 {
-	printf("name : %s", list->name);
-	printf("size : %d\n", list->size);
-	printf("offset : %d\n", list->offset);
+	printf("name : %s", list[i].name);
+	printf("size : %d\n", list[i].size);
+	printf("offset : %d\n", list[i].offset);
 
 	printf("\n");
 
@@ -202,46 +199,3 @@ int change_decimal(char buf[])
 	}
 	return -1;
 }
-/**
-/**
- * @param num decimal
- * brief int to array
- *
-int *int_to_array(int num)
-{
-	int R; // 나머지
-	int i = 0, j = 0;
-	int decimal[50] = {'\0',};
-
-	printf("int_to_array in\n");
-	while(num  != 0)
-	{
-		R = num%10;
-		num = num/10;
-		decimal[i] = R;
-		i++;
-	}
-
-	i=0;
-
-	while(decimal[i] != '\0')
-	{
-		i++;
-	}
-	
-	for(j = 0; j < i; j++)
-	{
-		rtn[j] = decimal[i-j-1];
-	}
-	
-	for(i = 0; i < 5; i++)
-	{
-		j = *p;
-		p++;
-	}
-
-	
-
-	return p;
-}
-*/
