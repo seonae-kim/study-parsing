@@ -5,12 +5,10 @@
  * @file parsing.c
  * @version 1.0.0
  */
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
+#include <unistd.h>
 
 #define FOPEN 1
 
@@ -27,20 +25,56 @@ struct List {	//structure
 	int offset;
 };
 
-
-
 int htoi(char []);
 void set_list( FILE*, struct List*, int );
 void print_list(struct List[], int);
 
-int main(void)
+int main(int argc, char *argv[])
 {
 	char buf[100] = {'\0',};
 	int i;	//for for문
 	int count = 0;
+	int c, opt = 0, optf = 0;	//switch
+
 	struct List* list;
 
-	fp = fopen("fwenv.config", "r");	//file open
+	char *file;
+	char *default_f = "fwenv.config";
+
+	while( (c = getopt(argc, argv, "hvf:")) != -1)
+	{
+		opt = 1;
+		switch (c) {
+			case 'h':
+				printf("Usage:\n");
+				printf("./a.out [option] filename\n");
+				printf("Options\n");
+				printf("-h			help\n");
+				printf("-v			version\n");
+				printf("-f <filename>		filename\n");
+				exit(0);
+				break;
+			case 'v':
+				printf("\nversion 1.0\n\n");
+				break;
+			case 'f':
+					file = optarg;
+					optf = 1;
+					break;
+			default:
+				break;
+		}
+	}
+	if(opt < 1)
+	{	
+		printf("if you want to help, type '-h'\n");
+		exit(0);
+	}
+
+	if(optf != 1)
+		file = default_f;
+
+	fp = fopen(file, "r");	//file open
 
 	if(fp == NULL)	
 		printf("file open fail\n\n");
@@ -55,7 +89,7 @@ int main(void)
 			count++;
 		}
 	}
-	printf("count : %d\n", count);	
+
 	list = (struct List*) malloc(sizeof(struct List)*count);
 
 	if(list == NULL)
