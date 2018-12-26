@@ -29,7 +29,7 @@ struct List {	//structure
 
 
 
-int change_decimal(char []);
+int htoi(char []);
 void set_list( FILE*, struct List*, int );
 void print_list(struct List[], int);
 
@@ -118,7 +118,7 @@ void set_list(FILE* fp, struct List list[], int i)
 			strcpy(buf, str+2);
 			
 			if( strchr(buf, 'x') != NULL){
-				decimal = change_decimal(buf);
+				decimal = htoi(buf);
 				list[i].size = decimal; //change_decimal(buf);
 			}
 			else
@@ -133,7 +133,7 @@ void set_list(FILE* fp, struct List list[], int i)
 
 			if( strchr(buf, 'x') != NULL)
 			{
-				decimal = change_decimal(buf);
+				decimal = htoi(buf);
 				list[i].offset = decimal;
 			}
 			else
@@ -164,7 +164,7 @@ void print_list(struct List list[], int i)
 	return;
 }
 
-int change_decimal(char buf[])
+int htoi(char buf[])
 {
 	int i;
 	int decimal = 0;	//10진수를 저장할 변수
@@ -175,18 +175,21 @@ int change_decimal(char buf[])
 	{
 		char ch = buf[i];
 
-
 		if( ch == 'x')
 		{
 			return decimal;
 		}
 		else if( ch >= '0' && ch <= '9')
 		{
-			decimal += (ch - 48) * pow(16, position);
+			decimal += (ch - '0') * (1 << (4 * position));
 		}
-		else if (ch >= 65 && ch <= 70)
+		else if (ch >= 'a' && ch <= 'f')
 		{
-			decimal += (ch - (97 - 10)) * pow(16, position);
+			decimal += (ch - ('a' - 0xa)) * (1 << (4 *  position));
+		}
+		else if (ch >= 'A' && ch <= 'F')
+		{
+			decimal += (ch - ('A' - 0xa)) * (1 << (4 *  position));
 		}
 		else
 		{
