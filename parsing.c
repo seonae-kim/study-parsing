@@ -123,6 +123,7 @@ void set_list(FILE* fp, linkedList* list)// struct List list[], int i)
 {
 
 	char *str;
+	char *endptr;
 	char buf[100] = {'\0'};
 	int decimal;
 
@@ -138,77 +139,32 @@ void set_list(FILE* fp, linkedList* list)// struct List list[], int i)
 		{
 			str = strstr(buf, "=");
 			strcpy(buf, str+2);
+
+			decimal = strtoul(buf, &endptr, 0);
 			
-			if( strchr(buf, 'x') != NULL){
-				decimal = htoi(buf);
-				list->cur->size = decimal;
-			}
+			if(*endptr != '\n')//'\n')
+				list->cur->size = -1;
 			else
-			{
-				list->cur->size = atoi(str+2);
-			}
+				list->cur->size = decimal;
+
 		}
 		else if(!strncmp(buf, "\t\toffset", 8))	//offset
 		{
 			str = strstr(buf, "=");
 			strcpy(buf, str+2);
 
-			if( strchr(buf, 'x') != NULL)
-			{
-				decimal = htoi(buf);
+			decimal = strtoul(buf, &endptr, 0);
+
+			if(*endptr != '\n')
+				list->cur->offset = -1;
+			else
 				list->cur->offset = decimal;
-			}
-			else 
-			{
-				list->cur->offset = atoi(str+2);
-			}
 		}
 		else if(!strncmp(buf, "}",1))	//finish
 			return;
 	}
 	return;
 
-}
-/**
- * @param buf 
- */
-int htoi(char buf[])
-{
-	int i;
-	int decimal = 0;	//10진수를 저장할 변수
-	int position = 0;	//자리 수
-	
-
-	for( i = strlen(buf) -1; i >= 0; i--)
-	{
-		char ch = buf[i];
-
-		if( ch == 'x')
-		{
-			return decimal;
-		}
-		else if( ch >= '0' && ch <= '9')
-		{
-			decimal += (ch - '0') * (1 << (4 * position));
-		}
-		else if (ch >= 'a' && ch <= 'f')
-		{
-			decimal += (ch - ('a' - 0xa)) * (1 << (4 *  position));
-		}
-		else if (ch >= 'A' && ch <= 'F')
-		{
-			decimal += (ch - ('A' - 0xa)) * (1 << (4 *  position));
-		}
-		else
-		{
-			continue;
-		}
-
-
-		position++;
-
-	}
-	return -1;
 }
 
 void createNode(linkedList *L)
