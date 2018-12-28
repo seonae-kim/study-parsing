@@ -14,32 +14,41 @@
 
 
 FILE* fp = NULL;	//global variable
-char num[100];
 
-/**
- * @struct save value
- */
-struct List {	//structure
+typedef struct _list {
+	struct _node *cur;
+	struct _node *head;
+	struct _node *tail;
+} linkedList;
+
+typedef struct _node {
 	char name[10];
-	int size;	//16진수로 된 문자열
+	int size;
 	int offset;
-};
+	struct _node *next;
+} node;
 
+void createNode(linkedList *);
+void printNodes(linkedList *);
 int htoi(char []);
-void set_list( FILE*, struct List*, int );
-void print_list(struct List[], int);
+void set_list(FILE*, linkedList*);
 
 int main(int argc, char *argv[])
 {
 	char buf[100] = {'\0',};
 	int i;	//for for문
-	int count = 0;
 	int c, opt = 0, optf = 0;	//switch
 
 	struct List* list;
 
 	char *file;
 	char *default_f = "fwenv.config";
+
+	linkedList *L = (linkedList *)malloc(sizeof(linkedList));
+	
+	L->cur = NULL;
+	L->head = NULL;
+	L->tail = NULL;
 
 	while( (c = getopt(argc, argv, "hvf:")) != -1)
 	{
@@ -80,40 +89,19 @@ int main(int argc, char *argv[])
 		printf("file open fail\n\n");
 	else
 		printf("file open success\n\n");
-
-
-	while( (fgets(buf, sizeof(buf), fp)) != NULL)	//count volmue
+		
+	while( (fgets(buf, sizeof(buf), fp)) != NULL)	//first volume
+		
 	{
-		if( !strncmp(buf, "volume", 6))
+		if( !strncmp(buf, "volume", 6))		//enter set_list with volume.
 		{
-			count++;
+			createNode(L);
+			set_list(fp, L);
+			continue;	
 		}
-	}
-
-	list = (struct List*) malloc(sizeof(struct List)*count);
-
-	if(list == NULL)
-			printf("malloc fail\n");
-
-	rewind(fp);
-
-	for(i=0; i<count; i++)
-	{
-
-		while( (fgets(buf, sizeof(buf), fp)) != NULL)	//first volume
-		{
-			if( !strncmp(buf, "volume", 6))		//enter set_list with volume.
-			{
-				set_list(fp, list, i);
-				break;	//if return, break; for next volume
-			}
 	
 		}
-		print_list(list, i);
-	}
-
-	
-	free(list);
+		printNodes(L);
 
 	if(fclose(fp) == EOF) {
 		perror("fwenv.config\n");
@@ -131,7 +119,7 @@ int main(int argc, char *argv[])
  * @param list struct
  * @brief store value in list
  */
-void set_list(FILE* fp, struct List list[], int i)
+void set_list(FILE* fp, linkedList* list)// struct List list[], int i)
 {
 
 	char *str;
@@ -143,7 +131,7 @@ void set_list(FILE* fp, struct List list[], int i)
 		if(!strncmp(buf, "\t\tname", 6))	//name
 		{
 			str = strstr(buf, "=");
-			strncpy(list[i].name, str+2, 20);	//str is "= name" so to get name, moved pointer +2
+			strncpy(list->cur->name, str+2, 20);
 		}
 	
 		else if(!strncmp(buf, "\t\tsize", 6))	//size
@@ -153,11 +141,11 @@ void set_list(FILE* fp, struct List list[], int i)
 			
 			if( strchr(buf, 'x') != NULL){
 				decimal = htoi(buf);
-				list[i].size = decimal; //change_decimal(buf);
+				list->cur->size = decimal;
 			}
 			else
 			{
-				list[i].size = atoi(str+2);
+				list->cur->size = atoi(str+2);
 			}
 		}
 		else if(!strncmp(buf, "\t\toffset", 8))	//offset
@@ -168,11 +156,11 @@ void set_list(FILE* fp, struct List list[], int i)
 			if( strchr(buf, 'x') != NULL)
 			{
 				decimal = htoi(buf);
-				list[i].offset = decimal;
+				list->cur->offset = decimal;
 			}
-			else
+			else 
 			{
-				list[i].offset = atoi(str+2);
+				list->cur->offset = atoi(str+2);
 			}
 		}
 		else if(!strncmp(buf, "}",1))	//finish
@@ -181,23 +169,9 @@ void set_list(FILE* fp, struct List list[], int i)
 	return;
 
 }
-
 /**
- * @brief print data
- * @param list structure
+ * @param buf 
  */
-	
-void print_list(struct List list[], int i)
-{
-	printf("name : %s", list[i].name);
-	printf("size : %d\n", list[i].size);
-	printf("offset : %d\n", list[i].offset);
-
-	printf("\n");
-
-	return;
-}
-
 int htoi(char buf[])
 {
 	int i;
@@ -228,11 +202,46 @@ int htoi(char buf[])
 		else
 		{
 			continue;
-			
 		}
+
 
 		position++;
 
 	}
 	return -1;
 }
+
+void createNode(linkedList *L)
+{
+	node *newNode = (node*)malloc(sizeof(node));
+	newNode->next = NULL;
+	newNode->size = 0;
+	newNode->offset = 0;
+
+	if(L->head == NULL && L->tail == NULL)
+		L->head = L->tail = newNode;
+	else
+	{
+		L->tail->next = newNode;
+		L->tail = newNode;
+	}
+	
+	L->cur = newNode;
+}
+
+void printNodes(linkedList *L)
+{
+	node *p = L->head;
+
+	while(p != NULL)
+	{
+		printf("name : %s", p->name);
+		printf("size : %d\n", p->size);
+		printf("offset : %d\n", p->offset);
+		p = p->next;
+		printf("\n");
+	}
+	putchar('\n');
+}
+
+
