@@ -10,9 +10,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#define FOPEN 1
-
-
 FILE* fp = NULL;	//global variable
 
 typedef struct _list {
@@ -30,7 +27,6 @@ typedef struct _node {
 
 void createNode(linkedList *);
 void printNodes(linkedList *);
-int htoi(char []);
 void set_list(FILE*, linkedList*);
 
 int main(int argc, char *argv[])
@@ -38,8 +34,6 @@ int main(int argc, char *argv[])
 	char buf[100] = {'\0',};
 	int i;	//for for문
 	int c, opt = 0, optf = 0;	//switch
-
-	struct List* list;
 
 	char *file;
 	char *default_f = "fwenv.config";
@@ -76,7 +70,7 @@ int main(int argc, char *argv[])
 	}
 	if(opt < 1)
 	{	
-		printf("if you want to help, type '-h'\n");
+		printf("type '-h'\n");
 		exit(0);
 	}
 
