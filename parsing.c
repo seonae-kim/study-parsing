@@ -1,6 +1,7 @@
 /**
  * @author kimseonae
- * @brief  bnd save datas in struct list
+ * @brief1  bnd save datas in struct list
+ * @brief2 this is test, and save datas in struct list
  * @date 2018-12-20
  * @file parsing.c
  * @version 1.0.0
