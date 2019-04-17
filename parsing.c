@@ -1,6 +1,6 @@
 /**
  * @author kimseonae
- * @brief read file, and save datas in struct list
+ * @brief this is test, and save datas in struct list
  * @date 2018-12-20
  * @file parsing.c
  * @version 1.0.0
